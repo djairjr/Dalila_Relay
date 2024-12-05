@@ -13,11 +13,11 @@ logger:
 # Enable Home Assistant API
 api:
   encryption:
-    key: ""
+    key: "oMSbId/i3U6/Da8BxPcSdGOWBsoMvauo2ftG32UjdO4="
 
 ota:
   - platform: esphome
-    password: ""
+    password: "eb6ae2177cb2379570cad83092e149c1"
 
 wifi:
   ssid: !secret wifi_ssid
@@ -25,141 +25,291 @@ wifi:
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "Dalila-Relay Fallback Hotspot"
-    password: "zCSsUoXRKUaA"
+    ssid: "Dalila-Relay-Config"
+    password: "Dalila1234"
 
 captive_portal:
 
-# Definição de variáveis globais para os estados dos relés
-globals:
-  - id: relay1_enabled
-    type: bool
-    restore_value: no
-    initial_value: 'false'  # Inicializa o Relé 1 como desligado
-  - id: relay2_enabled
-    type: bool
-    restore_value: no
-    initial_value: 'false'  # Inicializa o Relé 2 como desligado
-  - id: relay3_enabled
-    type: bool
-    restore_value: no
-    initial_value: 'false'  # Inicializa o Relé 3 como desligado
-  - id: relay4_enabled
-    type: bool
-    restore_value: no
-    initial_value: 'false'  # Inicializa o Relé 4 como desligado
+web_server:
+  port: 80
 
+
+# Configuração das variáveis globais para controle de tempo e estado
+globals:
   - id: relay1_on_time
     type: int
-    restore_value: no
-    initial_value: "1000"  # Tempo de 1 segundo para o Relé 1
-  - id: relay2_on_time
-    type: int
-    restore_value: no
-    initial_value: "1000"  # Tempo de 1 segundo para o Relé 2
-  - id: relay3_on_time
-    type: int
-    restore_value: no
-    initial_value: "1000"  # Tempo de 1 segundo para o Relé 3
-  - id: relay4_on_time
-    type: int
-    restore_value: no
-    initial_value: "1000"  # Tempo de 1 segundo para o Relé 4
+    restore_value: yes
+    initial_value: '500'
   - id: relay1_off_time
     type: int
-    restore_value: no
-    initial_value: "1000"  # Tempo de 1 segundo para o Relé 1
+    restore_value: yes
+    initial_value: '500'
+  - id: relay1_enabled
+    type: bool
+    restore_value: yes
+    initial_value: 'false'
+
+  - id: relay2_on_time
+    type: int
+    restore_value: yes
+    initial_value: '500'
   - id: relay2_off_time
     type: int
-    restore_value: no
-    initial_value: "1000"  # Tempo de 1 segundo para o Relé 2
+    restore_value: yes
+    initial_value: '500'
+  - id: relay2_enabled
+    type: bool
+    restore_value: yes
+    initial_value: 'false'
+
+  - id: relay3_on_time
+    type: int
+    restore_value: yes
+    initial_value: '500'
   - id: relay3_off_time
     type: int
-    restore_value: no
-    initial_value: "1000"  # Tempo de 1 segundo para o Relé 3
+    restore_value: yes
+    initial_value: '500'
+  - id: relay3_enabled
+    type: bool
+    restore_value: yes
+    initial_value: 'false'
+
+  - id: relay4_on_time
+    type: int
+    restore_value: yes
+    initial_value: '500'
   - id: relay4_off_time
     type: int
-    restore_value: no
-    initial_value: "1000"  # Tempo de 1 segundo para o Relé 4
+    restore_value: yes
+    initial_value: '500'
+  - id: relay4_enabled
+    type: bool
+    restore_value: yes
+    initial_value: 'false'
 
-
-
-# Relés configurados como saídas GPIO
+# Configuração dos relés físicos
 switch:
   - platform: gpio
-    name: "Relay 1"
     pin: GPIO25
     id: relay1_switch
+    restore_mode: ALWAYS_OFF
+
   - platform: gpio
-    name: "Relay 2"
     pin: GPIO26
     id: relay2_switch
+    restore_mode: ALWAYS_OFF
+
   - platform: gpio
-    name: "Relay 3"
     pin: GPIO33
     id: relay3_switch
+    restore_mode: ALWAYS_OFF
+
   - platform: gpio
-    name: "Relay 4"
     pin: GPIO32
     id: relay4_switch
+    restore_mode: ALWAYS_OFF
 
-# Switches para ativar/desativar a funcionalidade intermitente de cada relê
+# Botões para ativar/desativar a intermitência
   - platform: template
-    name: "Enable Relay 1 Intermittent"
-    id: enable_relay1
+    name: "Ativar Intermitência Cabaça 1"
     lambda: |-
       return id(relay1_enabled);
     turn_on_action:
-      then:
-        - lambda: |-
-            id(relay1_enabled) = true;
+      - lambda: 'id(relay1_enabled) = true;'
+      - script.execute: blink_relay1
     turn_off_action:
-      then:
-        - lambda: |-
-            id(relay1_enabled) = false;
+      - lambda: 'id(relay1_enabled) = false;'
+      - script.stop: blink_relay1
 
   - platform: template
-    name: "Enable Relay 2 Intermittent"
-    id: enable_relay2
+    name: "Ativar Intermitência Cabaça 2"
     lambda: |-
       return id(relay2_enabled);
     turn_on_action:
-      then:
-        - lambda: |-
-            id(relay2_enabled) = true;
+      - lambda: 'id(relay2_enabled) = true;'
+      - script.execute: blink_relay2
     turn_off_action:
-      then:
-        - lambda: |-
-            id(relay2_enabled) = false;
+      - lambda: 'id(relay2_enabled) = false;'
+      - script.stop: blink_relay2
 
   - platform: template
-    name: "Enable Relay 3 Intermittent"
-    id: enable_relay3
+    name: "Ativar Intermitência Cabaça 3"
     lambda: |-
       return id(relay3_enabled);
     turn_on_action:
-      then:
-        - lambda: |-
-            id(relay3_enabled) = true;
+      - lambda: 'id(relay3_enabled) = true;'
+      - script.execute: blink_relay3
     turn_off_action:
-      then:
-        - lambda: |-
-            id(relay3_enabled) = false;
+      - lambda: 'id(relay3_enabled) = false;'
+      - script.stop: blink_relay3
 
   - platform: template
-    name: "Enable Relay 4 Intermittent"
-    id: enable_relay4
+    name: "Ativar Intermitência Cabaça 4"
     lambda: |-
       return id(relay4_enabled);
     turn_on_action:
-      then:
-        - lambda: |-
-            id(relay4_enabled) = true;
+      - lambda: 'id(relay4_enabled) = true;'
+      - script.execute: blink_relay4
     turn_off_action:
+      - lambda: 'id(relay4_enabled) = false;'
+      - script.stop: blink_relay4
+
+# Sliders para controle via interface web
+number:
+  - platform: template
+    name: "Cabaça 1 Tempo ON (ms)"
+    id: relay1_on_time_slider
+    optimistic: true
+    min_value: 500
+    max_value: 20000
+    step: 500
+    unit_of_measurement: "ms"
+    initial_value: 500
+    on_value:
       then:
-        - lambda: |-
-            id(relay4_enabled) = false;
+        - lambda: 'id(relay1_on_time) = (int)x;'
+
+  - platform: template
+    name: "Cabaça 1 Tempo OFF (ms)"
+    id: relay1_off_time_slider
+    optimistic: true
+    min_value: 500
+    max_value: 20000
+    step: 500
+    unit_of_measurement: "ms"
+    initial_value: 500
+    on_value:
+      then:
+        - lambda: 'id(relay1_off_time) = (int)x;'
+
+  - platform: template
+    name: "Cabaça 2 Tempo ON (ms)"
+    id: relay2_on_time_slider
+    optimistic: true
+    min_value: 500
+    max_value: 20000
+    step: 500
+    unit_of_measurement: "ms"
+    initial_value: 500
+    on_value:
+      then:
+        - lambda: 'id(relay2_on_time) = (int)x;'
+
+  - platform: template
+    name: "Cabaça 2 Tempo OFF (ms)"
+    id: relay2_off_time_slider
+    optimistic: true
+    min_value: 500
+    max_value: 20000
+    step: 500
+    unit_of_measurement: "ms"
+    initial_value: 500
+    on_value:
+      then:
+        - lambda: 'id(relay2_off_time) = (int)x;'
+
+  - platform: template
+    name: "Cabaça 3 Tempo ON (ms)"
+    id: relay3_on_time_slider
+    optimistic: true
+    min_value: 500
+    max_value: 20000
+    step: 500
+    unit_of_measurement: "ms"
+    initial_value: 500
+    on_value:
+      then:
+        - lambda: 'id(relay3_on_time) = (int)x;'
+
+  - platform: template
+    name: "Cabaça 3 Tempo OFF (ms)"
+    id: relay3_off_time_slider
+    optimistic: true
+    min_value: 500
+    max_value: 20000
+    step: 500
+    unit_of_measurement: "ms"
+    initial_value: 500
+    on_value:
+      then:
+        - lambda: 'id(relay3_off_time) = (int)x;'
+
+  - platform: template
+    name: "Cabaça 4 Tempo ON (ms)"
+    id: relay4_on_time_slider
+    optimistic: true
+    min_value: 500
+    max_value: 20000
+    step: 500
+    unit_of_measurement: "ms"
+    initial_value: 500
+    on_value:
+      then:
+        - lambda: 'id(relay4_on_time) = (int)x;'
+
+  - platform: template
+    name: "Cabaça 4 Tempo OFF (ms)"
+    id: relay4_off_time_slider
+    optimistic: true
+    min_value: 500
+    max_value: 20000
+    step: 500
+    unit_of_measurement: "ms"
+    initial_value: 500
+    on_value:
+      then:
+        - lambda: 'id(relay4_off_time) = (int)x;'
 
 
 
+# Scripts de intermitência para cada relé
+script:
+  - id: blink_relay1
+    mode: parallel
+    then:
+      - while:
+          condition:
+            lambda: 'return id(relay1_enabled);'
+          then:
+            - switch.turn_on: relay1_switch
+            - delay: !lambda "return id(relay1_on_time);"
+            - switch.turn_off: relay1_switch
+            - delay: !lambda "return id(relay1_off_time);"
+
+  - id: blink_relay2
+    mode: parallel
+    then:
+      - while:
+          condition:
+            lambda: 'return id(relay2_enabled);'
+          then:
+            - switch.turn_on: relay2_switch
+            - delay: !lambda "return id(relay2_on_time);"
+            - switch.turn_off: relay2_switch
+            - delay: !lambda "return id(relay2_off_time);"
+
+  - id: blink_relay3
+    mode: parallel
+    then:
+      - while:
+          condition:
+            lambda: 'return id(relay3_enabled);'
+          then:
+            - switch.turn_on: relay3_switch
+            - delay: !lambda "return id(relay3_on_time);"
+            - switch.turn_off: relay3_switch
+            - delay: !lambda "return id(relay3_off_time);"
+
+  - id: blink_relay4
+    mode: parallel
+    then:
+      - while:
+          condition:
+            lambda: 'return id(relay4_enabled);'
+          then:
+            - switch.turn_on: relay4_switch
+            - delay: !lambda "return id(relay4_on_time);"
+            - switch.turn_off: relay4_switch
+            - delay: !lambda "return id(relay4_off_time);"
 
