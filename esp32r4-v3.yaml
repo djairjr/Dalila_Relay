@@ -1,22 +1,88 @@
 esphome:
-  name: esp32_relay_controller
-  platform: ESP32
+  name: dalila-relay
+  friendly_name: Dalila_Relay
+
+esp32:
   board: esp32dev
+  framework:
+    type: arduino
 
+# Enable logging
 logger:
-  level: DEBUG
 
+# Enable Home Assistant API
 api:
+  encryption:
+    key: ""
+
 ota:
+  - platform: esphome
+    password: ""
 
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "Esp32RelayFallback"
-    password: "backup_password"
+    ssid: "Dalila-Relay Fallback Hotspot"
+    password: "zCSsUoXRKUaA"
 
 captive_portal:
+
+# Definição de variáveis globais para os estados dos relés
+globals:
+  - id: relay1_enabled
+    type: bool
+    restore_value: no
+    initial_value: 'false'  # Inicializa o Relé 1 como desligado
+  - id: relay2_enabled
+    type: bool
+    restore_value: no
+    initial_value: 'false'  # Inicializa o Relé 2 como desligado
+  - id: relay3_enabled
+    type: bool
+    restore_value: no
+    initial_value: 'false'  # Inicializa o Relé 3 como desligado
+  - id: relay4_enabled
+    type: bool
+    restore_value: no
+    initial_value: 'false'  # Inicializa o Relé 4 como desligado
+
+  - id: relay1_on_time
+    type: int
+    restore_value: no
+    initial_value: "1000"  # Tempo de 1 segundo para o Relé 1
+  - id: relay2_on_time
+    type: int
+    restore_value: no
+    initial_value: "1000"  # Tempo de 1 segundo para o Relé 2
+  - id: relay3_on_time
+    type: int
+    restore_value: no
+    initial_value: "1000"  # Tempo de 1 segundo para o Relé 3
+  - id: relay4_on_time
+    type: int
+    restore_value: no
+    initial_value: "1000"  # Tempo de 1 segundo para o Relé 4
+  - id: relay1_off_time
+    type: int
+    restore_value: no
+    initial_value: "1000"  # Tempo de 1 segundo para o Relé 1
+  - id: relay2_off_time
+    type: int
+    restore_value: no
+    initial_value: "1000"  # Tempo de 1 segundo para o Relé 2
+  - id: relay3_off_time
+    type: int
+    restore_value: no
+    initial_value: "1000"  # Tempo de 1 segundo para o Relé 3
+  - id: relay4_off_time
+    type: int
+    restore_value: no
+    initial_value: "1000"  # Tempo de 1 segundo para o Relé 4
+
+
 
 # Relés configurados como saídas GPIO
 switch:
@@ -37,107 +103,63 @@ switch:
     pin: GPIO32
     id: relay4_switch
 
-# Criação dos sliders para ajuste de tempo na interface web
-globals:
-  - id: relay1_on_time
-    type: int
-    restore_value: no
-    initial_value: "1000"  # Tempo inicial (ms)
-  - id: relay1_off_time
-    type: int
-    restore_value: no
-    initial_value: "1000"
-
-  - id: relay2_on_time
-    type: int
-    restore_value: no
-    initial_value: "1000"
-  - id: relay2_off_time
-    type: int
-    restore_value: no
-    initial_value: "1000"
-
-  - id: relay3_on_time
-    type: int
-    restore_value: no
-    initial_value: "1000"
-  - id: relay3_off_time
-    type: int
-    restore_value: no
-    initial_value: "1000"
-
-  - id: relay4_on_time
-    type: int
-    restore_value: no
-    initial_value: "1000"
-  - id: relay4_off_time
-    type: int
-    restore_value: no
-    initial_value: "1000"
-
-  - id: relay1_enabled
-    type: bool
-    initial_value: "true"
-  - id: relay2_enabled
-    type: bool
-    initial_value: "true"
-  - id: relay3_enabled
-    type: bool
-    initial_value: "true"
-  - id: relay4_enabled
-    type: bool
-    initial_value: "true"
-
-# Interface Web para controle e ajustes dos relés
-web_server:
-  port: 80
-
-  # Slider para Relay 1
-  ui_text_slider:
-    name: "Relay 1 On Time (ms)"
-    min: 0
-    max: 30000
-    step: 500
+# Switches para ativar/desativar a funcionalidade intermitente de cada relê
+  - platform: template
+    name: "Enable Relay 1 Intermittent"
+    id: enable_relay1
     lambda: |-
-      return id(relay1_on_time);
+      return id(relay1_enabled);
+    turn_on_action:
+      then:
+        - lambda: |-
+            id(relay1_enabled) = true;
+    turn_off_action:
+      then:
+        - lambda: |-
+            id(relay1_enabled) = false;
 
-  ui_slider_action:
+  - platform: template
+    name: "Enable Relay 2 Intermittent"
+    id: enable_relay2
     lambda: |-
-      id(relay1_on_time) = (int)(x);
-      return std::to_string(id(relay1_on_time));
+      return id(relay2_enabled);
+    turn_on_action:
+      then:
+        - lambda: |-
+            id(relay2_enabled) = true;
+    turn_off_action:
+      then:
+        - lambda: |-
+            id(relay2_enabled) = false;
 
-  ui_text_slider:
-    name: "Relay 1 Off Time (ms)"
-    min: 0
-    max: 30000
-    step: 500
+  - platform: template
+    name: "Enable Relay 3 Intermittent"
+    id: enable_relay3
     lambda: |-
-      return id(relay1_off_time);
+      return id(relay3_enabled);
+    turn_on_action:
+      then:
+        - lambda: |-
+            id(relay3_enabled) = true;
+    turn_off_action:
+      then:
+        - lambda: |-
+            id(relay3_enabled) = false;
 
-  ui_slider_action:
+  - platform: template
+    name: "Enable Relay 4 Intermittent"
+    id: enable_relay4
     lambda: |-
-      id(relay1_off_time) = (int)(x);
-      return std::to_string(id(relay1_off_time));
+      return id(relay4_enabled);
+    turn_on_action:
+      then:
+        - lambda: |-
+            id(relay4_enabled) = true;
+    turn_off_action:
+      then:
+        - lambda: |-
+            id(relay4_enabled) = false;
 
-# Timer que controla a intermitência dos relés
-interval:
-  - interval: 1s
-    then:
-      - lambda: |-
-          static unsigned long last_time1 = 0;
-          static bool relay1_state = false;
-          unsigned long now = millis();
 
-          if (id(relay1_enabled)) {
-            if (relay1_state && now - last_time1 >= id(relay1_on_time)) {
-              id(relay1_switch).turn_off();
-              relay1_state = false;
-              last_time1 = now;
-            } else if (!relay1_state && now - last_time1 >= id(relay1_off_time)) {
-              id(relay1_switch).turn_on();
-              relay1_state = true;
-              last_time1 = now;
-            }
-          } else {
-            id(relay1_switch).turn_off(); // Mantém o relé sempre desligado
-          }
+
+
