@@ -1,0 +1,143 @@
+esphome:
+  name: esp32_relay_controller
+  platform: ESP32
+  board: esp32dev
+
+logger:
+  level: DEBUG
+
+api:
+ota:
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "Esp32RelayFallback"
+    password: "backup_password"
+
+captive_portal:
+
+# Relés configurados como saídas GPIO
+switch:
+  - platform: gpio
+    name: "Relay 1"
+    pin: GPIO25
+    id: relay1_switch
+  - platform: gpio
+    name: "Relay 2"
+    pin: GPIO26
+    id: relay2_switch
+  - platform: gpio
+    name: "Relay 3"
+    pin: GPIO33
+    id: relay3_switch
+  - platform: gpio
+    name: "Relay 4"
+    pin: GPIO32
+    id: relay4_switch
+
+# Criação dos sliders para ajuste de tempo na interface web
+globals:
+  - id: relay1_on_time
+    type: int
+    restore_value: no
+    initial_value: "1000"  # Tempo inicial (ms)
+  - id: relay1_off_time
+    type: int
+    restore_value: no
+    initial_value: "1000"
+
+  - id: relay2_on_time
+    type: int
+    restore_value: no
+    initial_value: "1000"
+  - id: relay2_off_time
+    type: int
+    restore_value: no
+    initial_value: "1000"
+
+  - id: relay3_on_time
+    type: int
+    restore_value: no
+    initial_value: "1000"
+  - id: relay3_off_time
+    type: int
+    restore_value: no
+    initial_value: "1000"
+
+  - id: relay4_on_time
+    type: int
+    restore_value: no
+    initial_value: "1000"
+  - id: relay4_off_time
+    type: int
+    restore_value: no
+    initial_value: "1000"
+
+  - id: relay1_enabled
+    type: bool
+    initial_value: "true"
+  - id: relay2_enabled
+    type: bool
+    initial_value: "true"
+  - id: relay3_enabled
+    type: bool
+    initial_value: "true"
+  - id: relay4_enabled
+    type: bool
+    initial_value: "true"
+
+# Interface Web para controle e ajustes dos relés
+web_server:
+  port: 80
+
+  # Slider para Relay 1
+  ui_text_slider:
+    name: "Relay 1 On Time (ms)"
+    min: 0
+    max: 30000
+    step: 500
+    lambda: |-
+      return id(relay1_on_time);
+
+  ui_slider_action:
+    lambda: |-
+      id(relay1_on_time) = (int)(x);
+      return std::to_string(id(relay1_on_time));
+
+  ui_text_slider:
+    name: "Relay 1 Off Time (ms)"
+    min: 0
+    max: 30000
+    step: 500
+    lambda: |-
+      return id(relay1_off_time);
+
+  ui_slider_action:
+    lambda: |-
+      id(relay1_off_time) = (int)(x);
+      return std::to_string(id(relay1_off_time));
+
+# Timer que controla a intermitência dos relés
+interval:
+  - interval: 1s
+    then:
+      - lambda: |-
+          static unsigned long last_time1 = 0;
+          static bool relay1_state = false;
+          unsigned long now = millis();
+
+          if (id(relay1_enabled)) {
+            if (relay1_state && now - last_time1 >= id(relay1_on_time)) {
+              id(relay1_switch).turn_off();
+              relay1_state = false;
+              last_time1 = now;
+            } else if (!relay1_state && now - last_time1 >= id(relay1_off_time)) {
+              id(relay1_switch).turn_on();
+              relay1_state = true;
+              last_time1 = now;
+            }
+          } else {
+            id(relay1_switch).turn_off(); // Mantém o relé sempre desligado
+          }
