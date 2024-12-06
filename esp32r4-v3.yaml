@@ -13,11 +13,11 @@ logger:
 # Enable Home Assistant API
 api:
   encryption:
-    key: "oMSbId/i3U6/Da8BxPcSdGOWBsoMvauo2ftG32UjdO4="
+    key: ""
 
 ota:
   - platform: esphome
-    password: "eb6ae2177cb2379570cad83092e149c1"
+    password: ""
 
 wifi:
   ssid: !secret wifi_ssid
@@ -26,7 +26,7 @@ wifi:
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "Dalila-Relay-Config"
-    password: "Dalila1234"
+    password: ""
 
 captive_portal:
 
