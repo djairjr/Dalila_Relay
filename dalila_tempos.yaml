@@ -1,0 +1,159 @@
+esphome:
+  name: dalila-relay
+  friendly_name: Dalila_Relay
+
+  on_boot:
+    priority: 600
+    then:
+      - script.execute: blink_relay1
+      - script.execute: blink_relay2
+      - script.execute: blink_relay3
+      - script.execute: blink_relay4
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "oMSbId/i3U6/Da8BxPcSdGOWBsoMvauo2ftG32UjdO4="
+
+ota:
+  - platform: esphome
+    password: "eb6ae2177cb2379570cad83092e149c1"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: ""
+    password: ""
+
+captive_portal:
+
+web_server:
+  port: 80
+  auth:
+    username: ""
+    password: ""
+
+
+status_led:
+  pin: GPIO02
+
+
+# Configuração dos relés físicos
+switch:
+  - platform: gpio
+    pin: GPIO25
+    id: relay1_switch
+    restore_mode: ALWAYS_OFF
+
+  - platform: gpio
+    pin: GPIO26
+    id: relay2_switch
+    restore_mode: ALWAYS_OFF
+
+  - platform: gpio
+    pin: GPIO33
+    id: relay3_switch
+    restore_mode: ALWAYS_OFF
+
+  - platform: gpio
+    pin: GPIO32
+    id: relay4_switch
+    restore_mode: ALWAYS_OFF
+
+# Script para modo síncrono (executa relês em sequência)
+
+script:
+
+# Modo Assíncrono
+  - id: blink_relay1
+    mode: parallel
+    then:
+      - while:
+          condition: 
+            lambda: 'return true;'
+          then:
+          - switch.turn_on: relay1_switch
+          - delay: "3s"
+          - switch.turn_off: relay1_switch
+          - delay: "15s"
+          - switch.turn_on: relay1_switch
+          - delay: "4s"
+          - switch.turn_off: relay1_switch
+          - delay: "15s"
+          - switch.turn_on: relay1_switch
+          - delay: "4s"
+          - switch.turn_off: relay1_switch
+          - delay: "20s"
+
+  - id: blink_relay2
+    mode: parallel
+    then:
+      - while:
+          condition:
+            lambda: 'return true;'
+          then:
+            - switch.turn_off: relay2_switch
+            - delay: "3s"
+            - switch.turn_on: relay2_switch
+            - delay: "3s"
+            - switch.turn_off: relay2_switch
+            - delay: "15s"
+            - switch.turn_on: relay2_switch
+            - delay: "5s"
+            - switch.turn_off: relay2_switch
+            - delay: "15s"
+            - switch.turn_on: relay2_switch
+            - delay: "4s"
+
+  - id: blink_relay3
+    mode: parallel
+    then:
+      - while:
+          condition:
+            lambda: 'return true;'
+          then:
+            - switch.turn_off: relay3_switch
+            - delay: "6s"
+            - switch.turn_on: relay3_switch
+            - delay: "4s"
+            - switch.turn_off: relay3_switch
+            - delay: "20s"
+            - switch.turn_on: relay3_switch
+            - delay: "5s"
+            - switch.turn_off: relay3_switch
+            - delay: "15s"
+            - switch.turn_on: relay3_switch
+            - delay: "4s"
+
+  - id: blink_relay4
+    mode: parallel
+    then:
+      - while:
+          condition:
+            lambda: 'return true;'
+          then:
+            - switch.turn_off: relay4_switch
+            - delay: "10s"
+            - switch.turn_on: relay4_switch
+            - delay: "5s"
+            - switch.turn_off: relay4_switch
+            - delay: "18s"
+            - switch.turn_on: relay4_switch
+            - delay: "4s"
+            - switch.turn_off: relay4_switch
+            - delay: "10s"
+            - switch.turn_on: relay4_switch
+            - delay: "5s"
+
+
