@@ -89,10 +89,16 @@ button:
     name: "Reinicia Sequência"
     on_press:
       - logger.log: "Reiniciando sequência dos relês."
+      - script.stop: blink_relay1
+      - script.stop: blink_relay2
+      - script.stop: blink_relay3
+      - script.stop: blink_relay4
+      
       - switch.turn_off: relay1_switch
       - switch.turn_off: relay2_switch
       - switch.turn_off: relay3_switch
       - switch.turn_off: relay4_switch
+
       - delay: "1s"
       - script.execute: blink_relay1
       - script.execute: blink_relay2
@@ -112,6 +118,7 @@ script:
           condition: 
             lambda: 'return true;'
           then:
+          - logger.log: "Inicio Cabaça 1"
           - switch.turn_on: relay1_switch
           - delay: "3s"
           - switch.turn_off: relay1_switch
@@ -132,6 +139,7 @@ script:
           condition:
             lambda: 'return true;'
           then:
+            - logger.log: "Inicio Cabaça 2"
             - switch.turn_off: relay2_switch
             - delay: "3s"
             - switch.turn_on: relay2_switch
@@ -152,6 +160,7 @@ script:
           condition:
             lambda: 'return true;'
           then:
+            - logger.log: "Inicio Cabaça 3"
             - switch.turn_off: relay3_switch
             - delay: "6s"
             - switch.turn_on: relay3_switch
@@ -172,6 +181,7 @@ script:
           condition:
             lambda: 'return true;'
           then:
+            - logger.log: "Inicio Cabaça 4"
             - switch.turn_off: relay4_switch
             - delay: "10s"
             - switch.turn_on: relay4_switch
@@ -184,5 +194,3 @@ script:
             - delay: "18s"
             - switch.turn_on: relay4_switch
             - delay: "5s"
-
-
