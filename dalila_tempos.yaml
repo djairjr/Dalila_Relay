@@ -9,6 +9,8 @@ esphome:
       - script.execute: blink_relay2
       - script.execute: blink_relay3
       - script.execute: blink_relay4
+
+
 esp32:
   board: esp32dev
   framework:
@@ -21,11 +23,11 @@ logger:
 # Enable Home Assistant API
 api:
   encryption:
-    key: "oMSbId/i3U6/Da8BxPcSdGOWBsoMvauo2ftG32UjdO4="
+    key: ""
 
 ota:
   - platform: esphome
-    password: "eb6ae2177cb2379570cad83092e149c1"
+    password: ""
 
 wifi:
   ssid: !secret wifi_ssid
@@ -33,7 +35,7 @@ wifi:
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: ""
+    ssid: "Dalila-Relay-Config"
     password: ""
 
 captive_portal:
@@ -41,8 +43,8 @@ captive_portal:
 web_server:
   port: 80
   auth:
-    username: ""
-    password: ""
+    username: "admin"
+    password: "password"
 
 
 status_led:
@@ -52,24 +54,51 @@ status_led:
 # Configuração dos relés físicos
 switch:
   - platform: gpio
+    name: "Cabaça 1"
+    icon: "mdi:fan"
     pin: GPIO25
     id: relay1_switch
     restore_mode: ALWAYS_OFF
 
+
   - platform: gpio
+    name: "Cabaça 2"
+    icon: "mdi:fan"
     pin: GPIO26
     id: relay2_switch
     restore_mode: ALWAYS_OFF
 
+
   - platform: gpio
+    name: "Cabaça 3"
+    icon: "mdi:fan"
     pin: GPIO33
     id: relay3_switch
     restore_mode: ALWAYS_OFF
 
+
   - platform: gpio
+    name: "Cabaça 4"
+    icon: "mdi:fan"
     pin: GPIO32
     id: relay4_switch
     restore_mode: ALWAYS_OFF
+
+button:
+  - platform: template
+    name: "Reinicia Sequência"
+    on_press:
+      - logger.log: "Reiniciando sequência dos relês."
+      - switch.turn_off: relay1_switch
+      - switch.turn_off: relay2_switch
+      - switch.turn_off: relay3_switch
+      - switch.turn_off: relay4_switch
+      - delay: "1s"
+      - script.execute: blink_relay1
+      - script.execute: blink_relay2
+      - script.execute: blink_relay3
+      - script.execute: blink_relay4
+
 
 # Script para modo síncrono (executa relês em sequência)
 
@@ -94,7 +123,7 @@ script:
           - switch.turn_on: relay1_switch
           - delay: "4s"
           - switch.turn_off: relay1_switch
-          - delay: "20s"
+          - delay: "19s"
 
   - id: blink_relay2
     mode: parallel
@@ -108,11 +137,11 @@ script:
             - switch.turn_on: relay2_switch
             - delay: "3s"
             - switch.turn_off: relay2_switch
-            - delay: "15s"
+            - delay: "20s"
             - switch.turn_on: relay2_switch
             - delay: "5s"
             - switch.turn_off: relay2_switch
-            - delay: "15s"
+            - delay: "25s"
             - switch.turn_on: relay2_switch
             - delay: "4s"
 
@@ -128,11 +157,11 @@ script:
             - switch.turn_on: relay3_switch
             - delay: "4s"
             - switch.turn_off: relay3_switch
-            - delay: "20s"
+            - delay: "23s"
             - switch.turn_on: relay3_switch
             - delay: "5s"
             - switch.turn_off: relay3_switch
-            - delay: "15s"
+            - delay: "18s"
             - switch.turn_on: relay3_switch
             - delay: "4s"
 
@@ -152,7 +181,7 @@ script:
             - switch.turn_on: relay4_switch
             - delay: "4s"
             - switch.turn_off: relay4_switch
-            - delay: "10s"
+            - delay: "18s"
             - switch.turn_on: relay4_switch
             - delay: "5s"
 
