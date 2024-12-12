@@ -1,6 +1,6 @@
 #define PIRSENSOR 2
 #define CHOCALHO 3
-#define SHAKETIME 250 // Tempo de ativação/desativaçao - quanto menor, mais rápido.
+#define SHAKETIME 250
 
 int state = LOW;
 int val = 0;
@@ -8,7 +8,7 @@ int val = 0;
 void setup() {
   Serial.begin (115200);
   delay (1000);
-  Serial.println ("Cascavel Cabaça");
+  Serial.println ("+++ Cascavel Cabaça +++");
   randomSeed(analogRead(0));
   pinMode (CHOCALHO, OUTPUT);
   pinMode (LED_BUILTIN, OUTPUT);
@@ -23,7 +23,7 @@ void loop() {
     delay(100);                // delay 100 milliseconds
 
     if (state == LOW) {
-      Serial.println("Motion detected!");
+      Serial.println("Movimento Detectado");
       state = HIGH;
       cascavel();
     }
@@ -33,7 +33,7 @@ void loop() {
     delay(200);             // delay 200 milliseconds
 
     if (state == HIGH) {
-      Serial.println("Motion stopped!");
+      Serial.println("Sem Movimento");
       state = LOW;
     }
   }
@@ -41,10 +41,10 @@ void loop() {
 
 
 void cascavel() {
-  # Vai fazer o movimento de 3 a 6 vezes aleatoriamente
   int interval = random(3, 6);
-
-  for (int i = 0; i == interval; i++) {
+  
+  for (int i = 0; i < interval; i++) {
+    Serial.println (">> Chacoalha <<");
     digitalWrite (CHOCALHO, HIGH);
     delay (SHAKETIME);
     digitalWrite (CHOCALHO, LOW);
